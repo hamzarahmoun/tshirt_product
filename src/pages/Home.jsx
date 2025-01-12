@@ -1,10 +1,11 @@
 import { motion, AnimatePresence } from 'framer-motion';
+import { slideAnimation } from '../config/motion';
 const Home = () => {
 
   return (
     <AnimatePresence>
       
-        <motion.section className="home" >
+        <motion.section className="home" {...slideAnimation('left')}>
           <motion.header >
             <img 
               src='./threejs.png'
