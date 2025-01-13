@@ -6,11 +6,13 @@ import { slideAnimation,
 
  } from '../config/motion';
 import CustomButton from '../components/CustomButton';
+import { useSnapshot } from 'valtio';
+import state from '../store';
 const Home = () => {
-
+  const snap = useSnapshot(state);
   return (
     <AnimatePresence>
-      
+       {snap.intro && (
         <motion.section className="home" {...slideAnimation('left')}>
           <motion.header {...slideAnimation("down")} >
             <img 
@@ -36,12 +38,14 @@ const Home = () => {
               <CustomButton 
                 type="filled"
                 title="Customize It"
+                handleClick={() => state.intro = false}
                 customStyles="w-fit px-4 py-2.5 font-bold text-sm"
               />
              
             </motion.div>
           </motion.div>
         </motion.section>
+         )}
     </AnimatePresence>
   )
 }
