@@ -1,12 +1,15 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { slideAnimation } from '../config/motion';
+import { slideAnimation,
+  headContainerAnimation,
+
+ } from '../config/motion';
 const Home = () => {
 
   return (
     <AnimatePresence>
       
         <motion.section className="home" {...slideAnimation('left')}>
-          <motion.header >
+          <motion.header {...slideAnimation("down")} >
             <img 
               src='./threejs.png'
               alt="logo"
@@ -14,7 +17,7 @@ const Home = () => {
             />
           </motion.header>
 
-          <motion.div className="home-content" >
+          <motion.div className="home-content" {...headContainerAnimation}>
             <motion.div >
               <h1 className="head-text">
                 LET'S <br className="xl:block hidden" /> DO IT.
