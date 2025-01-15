@@ -5,11 +5,22 @@ import state from '../store';
 import { fadeAnimation, slideAnimation } from '../config/motion';
 import { useSnapshot } from 'valtio';
 import CustomButton from '../components/CustomButton';
+import { ColorPicker, Tab } from '../components';
+import { EditorTabs } from '../config/constants';
 
 const Customizer = () => {
   const snap = useSnapshot(state);
-
-
+  const [activeEditorTab, setActiveEditorTab] = useState("");
+ 
+  const generateTabContent = () => {
+    switch (activeEditorTab) {
+      case "colorpicker":
+        return <ColorPicker />
+      
+      default:
+        return null;
+    }
+  }
 
   return (
     <AnimatePresence>
@@ -22,6 +33,15 @@ const Customizer = () => {
           >
             <div className="flex items-center min-h-screen">
               <div className="editortabs-container tabs">
+              {EditorTabs.map((tab) => (
+                  <Tab 
+                    key={tab.name}
+                    tab={tab}
+                    handleClick={() => setActiveEditorTab(tab.name)}
+                  />
+                ))}
+
+                {generateTabContent()}
               </div>
             </div>
           </motion.div>
