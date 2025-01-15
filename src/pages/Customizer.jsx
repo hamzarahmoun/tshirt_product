@@ -5,21 +5,63 @@ import state from '../store';
 import { fadeAnimation, slideAnimation } from '../config/motion';
 import { useSnapshot } from 'valtio';
 import CustomButton from '../components/CustomButton';
-import { ColorPicker, Tab } from '../components';
-import { EditorTabs } from '../config/constants';
+import { ColorPicker, FilePicker, Tab } from '../components';
+import { EditorTabs, FilterTabs } from '../config/constants';
 
 const Customizer = () => {
   const snap = useSnapshot(state);
+  const [file, setFile] = useState('');
   const [activeEditorTab, setActiveEditorTab] = useState("");
- 
+  const [activeFilterTab, setActiveFilterTab] = useState({
+    logoShirt: true,
+    stylishShirt: false,
+  })
+
   const generateTabContent = () => {
     switch (activeEditorTab) {
       case "colorpicker":
         return <ColorPicker />
+      case "filepicker":
+        return <FilePicker
+          file={file}
+          setFile={setFile}
+          readFile={readFile}
+        />
       
       default:
         return null;
     }
+  }
+  const handleActiveFilterTab = (tabName) => {
+    switch (tabName) {
+      case "logoShirt":
+        state.isLogoTexture = !activeFilterTab[tabName];
+        break;
+      case "stylishShirt":
+        state.isFullTexture = !activeFilterTab[tabName];
+        break;
+      default:
+        state.isLogoTexture = true;
+        state.isFullTexture = false;
+        break;
+    }
+
+    // after setting the state, activeFilterTab is updated
+
+    setActiveFilterTab((prevState) => {
+      return {
+        ...prevState,
+        [tabName]: !prevState[tabName]
+      }
+    })
+  }
+
+  const readFile = (type) => {
+    reader(file)
+      .then((result) => {
+        handleDecals(type, result);
+        setActiveEditorTab("");
+      })
   }
 
   return (
@@ -33,8 +75,8 @@ const Customizer = () => {
           >
             <div className="flex items-center min-h-screen">
               <div className="editortabs-container tabs">
-              {EditorTabs.map((tab) => (
-                  <Tab 
+                {EditorTabs.map((tab) => (
+                  <Tab
                     key={tab.name}
                     tab={tab}
                     handleClick={() => setActiveEditorTab(tab.name)}
@@ -50,7 +92,7 @@ const Customizer = () => {
             className="absolute z-10 top-5 right-5"
             {...fadeAnimation}
           >
-            <CustomButton 
+            <CustomButton
               type="filled"
               title="Go Back"
               handleClick={() => state.intro = true}
@@ -62,7 +104,15 @@ const Customizer = () => {
             className='filtertabs-container'
             {...slideAnimation("up")}
           >
-        
+            {FilterTabs.map((tab) => (
+              <Tab
+                key={tab.name}
+                tab={tab}
+                isFilterTab
+                isActiveTab={activeFilterTab[tab.name]}
+                handleClick={() => handleActiveFilterTab(tab.name)}
+              />
+            ))}
           </motion.div>
         </>
       )}
