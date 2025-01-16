@@ -15,22 +15,24 @@ const Customizer = () => {
   const [activeFilterTab, setActiveFilterTab] = useState({
     logoShirt: true,
     stylishShirt: false,
-  })
+  });
   const tabRef = useRef(null);
 
   const generateTabContent = () => {
     switch (activeEditorTab) {
       case "colorpicker":
-        return <ColorPicker />
+        return <ColorPicker />;
       case "filepicker":
         return <FilePicker
           file={file}
           setFile={setFile}
           readFile={readFile}
-        />
-      
+        />;
+      default:
+        return null;
     }
-  }
+  };
+
   const handleActiveFilterTab = (tabName) => {
     switch (tabName) {
       case "logoShirt":
@@ -45,16 +47,14 @@ const Customizer = () => {
         break;
     }
 
-    // after setting the state, activeFilterTab is updated
-
     setActiveFilterTab((prevState) => {
       return {
         ...prevState,
         [tabName]: !prevState[tabName]
-      }
-    })
-  }
-  
+      };
+    });
+  };
+
   const handleClickOutside = (event) => {
     if (tabRef.current && !tabRef.current.contains(event.target)) {
       setActiveEditorTab("");
@@ -68,13 +68,30 @@ const Customizer = () => {
     };
   }, []);
 
+  const reader = (file) => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.onload = () => resolve(fileReader.result);
+      fileReader.onerror = (error) => reject(error);
+      fileReader.readAsDataURL(file);
+    });
+  };
+
   const readFile = (type) => {
     reader(file)
       .then((result) => {
         handleDecals(type, result);
         setActiveEditorTab("");
       })
-  }
+      .catch((error) => {
+        console.error("Error reading file:", error);
+      });
+  };
+
+  const handleDecals = (type, result) => {
+    const decalType = type === 'logo' ? 'logoDecal' : 'fullDecal';
+    state[decalType] = result;
+  };
 
   return (
     <AnimatePresence>
@@ -85,22 +102,21 @@ const Customizer = () => {
             className="absolute top-0 left-0 z-10"
             {...slideAnimation('left')}
           >
-             <div ref={tabRef}>
-             <div className="flex items-center min-h-screen">
-              <div className="editortabs-container tabs">
-                {EditorTabs.map((tab) => (
-                  <Tab
-                    key={tab.name}
-                    tab={tab}
-                    handleClick={() => setActiveEditorTab(tab.name)}
-                  />
-                ))}
+            <div ref={tabRef}>
+              <div className="flex items-center min-h-screen">
+                <div className="editortabs-container tabs">
+                  {EditorTabs.map((tab) => (
+                    <Tab
+                      key={tab.name}
+                      tab={tab}
+                      handleClick={() => setActiveEditorTab(tab.name)}
+                    />
+                  ))}
 
-                {generateTabContent()}
+                  {generateTabContent()}
+                </div>
               </div>
             </div>
-             </div>
-           
           </motion.div>
 
           <motion.div
@@ -132,7 +148,7 @@ const Customizer = () => {
         </>
       )}
     </AnimatePresence>
-  )
-}
+  );
+};
 
-export default Customizer
+export default Customizer;
