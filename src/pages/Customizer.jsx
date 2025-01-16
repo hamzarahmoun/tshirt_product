@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import state from '../store';
@@ -16,6 +16,7 @@ const Customizer = () => {
     logoShirt: true,
     stylishShirt: false,
   })
+  const tabRef = useRef(null);
 
   const generateTabContent = () => {
     switch (activeEditorTab) {
@@ -28,8 +29,6 @@ const Customizer = () => {
           readFile={readFile}
         />
       
-      default:
-        return null;
     }
   }
   const handleActiveFilterTab = (tabName) => {
@@ -55,6 +54,19 @@ const Customizer = () => {
       }
     })
   }
+  
+  const handleClickOutside = (event) => {
+    if (tabRef.current && !tabRef.current.contains(event.target)) {
+      setActiveEditorTab("");
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const readFile = (type) => {
     reader(file)
@@ -73,7 +85,8 @@ const Customizer = () => {
             className="absolute top-0 left-0 z-10"
             {...slideAnimation('left')}
           >
-            <div className="flex items-center min-h-screen">
+             <div ref={tabRef}>
+             <div className="flex items-center min-h-screen">
               <div className="editortabs-container tabs">
                 {EditorTabs.map((tab) => (
                   <Tab
@@ -86,6 +99,8 @@ const Customizer = () => {
                 {generateTabContent()}
               </div>
             </div>
+             </div>
+           
           </motion.div>
 
           <motion.div
